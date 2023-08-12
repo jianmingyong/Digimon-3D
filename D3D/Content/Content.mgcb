@@ -1,0 +1,38 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin/$(Platform)
+/intermediateDir:obj/$(Platform)
+/platform:DesktopGL
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+/reference:..\..\D3D.Content.Pipeline\bin\net6.0\D3D.Content.Pipeline.dll
+
+#---------------------------------- Content ---------------------------------#
+
+#begin Audio/BGM/TestTitle.ogg
+/importer:OggImporter
+/processor:FmodBgmProcessor
+/processorParam:Quality=Best
+/processorParam:LoopStart=0
+/processorParam:LoopLength=0
+/build:Audio/BGM/TestTitle.ogg
+
+#begin Fonts/Pixel Digivolve.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Pixel Digivolve.spritefont
+
+#begin Shaders/BasicEffectWithAlphaTest.fx
+/importer:EffectImporter
+/processor:BasicEffectWithAlphaTestProcessor
+/processorParam:DebugMode=Optimize
+/processorParam:Defines=
+/build:Shaders/BasicEffectWithAlphaTest.fx
+

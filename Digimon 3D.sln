@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D3D", "D3D\D3D.csproj", "{D2D554F9-B0A7-4759-9EE9-5A8EB19C9658}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D3D.Content.Pipeline", "D3D.Content.Pipeline\D3D.Content.Pipeline.csproj", "{0B4FBA94-F3BE-4709-94D6-B5399976734D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D3D.Content", "D3D.Content\D3D.Content.csproj", "{4CB0D52F-499D-48F9-B066-B7602DA37056}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2D554F9-B0A7-4759-9EE9-5A8EB19C9658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2D554F9-B0A7-4759-9EE9-5A8EB19C9658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2D554F9-B0A7-4759-9EE9-5A8EB19C9658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2D554F9-B0A7-4759-9EE9-5A8EB19C9658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B4FBA94-F3BE-4709-94D6-B5399976734D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B4FBA94-F3BE-4709-94D6-B5399976734D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B4FBA94-F3BE-4709-94D6-B5399976734D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B4FBA94-F3BE-4709-94D6-B5399976734D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB0D52F-499D-48F9-B066-B7602DA37056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB0D52F-499D-48F9-B066-B7602DA37056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB0D52F-499D-48F9-B066-B7602DA37056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB0D52F-499D-48F9-B066-B7602DA37056}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

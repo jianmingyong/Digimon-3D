@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <Title>Digimon 3D Content Library</Title>
+        <Description>Provides custom content features into Digimon 3D</Description>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303">
+            <PrivateAssets>All</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="FMOD\lib\linux\x64\libfmod.so">
+            <Pack>true</Pack>
+            <PackagePath>runtimes/linux-x64/native/libfmod.so</PackagePath>
+        </None>
+        <None Include="FMOD\lib\osx\x64\libfmod.dylib">
+            <Pack>true</Pack>
+            <PackagePath>runtimes/osx-x64/native/libfmod.dylib</PackagePath>
+        </None>
+        <None Include="FMOD\lib\win\x64\fmod.dll">
+            <Pack>true</Pack>
+            <PackagePath>runtimes/win-x64/native/fmod.dll</PackagePath>
+        </None>
+        <None Include="FMOD\lib\win\x86\fmod.dll">
+            <Pack>true</Pack>
+            <PackagePath>runtimes/win-x86/native/fmod.dll</PackagePath>
+        </None>
+    </ItemGroup>
+    
+    <Target Name="AfterPack" AfterTargets="Pack">
+        <ItemGroup>
+            <DirToDelete Include="$(NuGetPackageRoot)$(TargetName.ToLower())" />
+        </ItemGroup>
+        
+        <RemoveDir Directories="@(DirToDelete)" ContinueOnError="true"/>
+        <Exec Command="dotnet nuget push $(PackageOutputPath)*.nupkg --source Digimon_3D"/>
+        <Exec Command="dotnet restore .."/>
+    </Target>
+
+</Project>
