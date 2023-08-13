@@ -1,58 +1,74 @@
 ﻿using D3D.Audio;
 using D3D.Content.Audio;
 using D3D.Resources;
+using D3D.Screens.Gui;
+using D3D.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace D3D;
 
-public class Core : Game
+public sealed class Core : Game
 {
     private readonly GraphicsDeviceManager _graphics;
-    private readonly FmodBgmAudioManager _fmodBgmAudioManager;
+    private readonly FmodAudioManager _fmodAudioManager;
+    private readonly AssetManager _assetManager;
+    private readonly DebugInformationDisplay _debugInformationDisplay;
 
     public Core()
     {
         _graphics = new GraphicsDeviceManager(this);
-        _ = new GameContentManager(this);
-        _fmodBgmAudioManager = new FmodBgmAudioManager(this);
+        _fmodAudioManager = new FmodAudioManager(this);
+        _assetManager = new AssetManager(Content);
+        _debugInformationDisplay = new DebugInformationDisplay(_graphics, _assetManager);
     }
 
     protected override void Initialize()
     {
+        Window.Title = $"{ApplicationUtility.Name} {ApplicationUtility.Version} ({ApplicationUtility.FrameworkVersion})";
+
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        
+
         if (_graphics.GraphicsDevice.Adapter.IsProfileSupported(GraphicsProfile.HiDef))
         {
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
         }
-        
+
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 720;
         _graphics.ApplyChanges();
-        
+
         base.Initialize();
+
+        _debugInformationDisplay.Initialize();
     }
 
     protected override void LoadContent()
     {
-        var test = Content.Load<FmodBgmSound>("Audio/BGM/TestTitle");
-        test.Play();
+        _debugInformationDisplay.LoadContent();
+        var bgm = _assetManager.LoadAsset<FmodBackgroundMusic>("Audio/BGM/TestTitle");
+        bgm.Play();
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
-
-        base.Update(gameTime);
+        _debugInformationDisplay.Update();
     }
 
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
+        
+        _debugInformationDisplay.Draw();
+    }
 
-        base.Draw(gameTime);
+    protected override void Dispose(bool disposing)
+    {
+        _assetManager.Dispose();
+        _fmodAudioManager.Dispose();
+        _debugInformationDisplay.Dispose();
+
+        base.Dispose(disposing);
     }
 }

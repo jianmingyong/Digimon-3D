@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 namespace D3D.Content.Pipeline.Shaders;
 
 [ContentTypeWriter]
-internal class BasicEffectWithAlphaTestWriter : ContentTypeWriter<BasicEffectWithAlphaTestContent>
+public class BasicEffectWithAlphaTestWriter : ContentTypeWriter<BasicEffectWithAlphaTestContent>
 {
     public override string GetRuntimeReader(TargetPlatform targetPlatform)
     {
@@ -15,7 +15,7 @@ internal class BasicEffectWithAlphaTestWriter : ContentTypeWriter<BasicEffectWit
 
     protected override void Write(ContentWriter output, BasicEffectWithAlphaTestContent value)
     {
-        output.Write(value.GetEffectCode().Length);
-        output.Write(value.GetEffectCode());
+        output.Write(value.EffectCode.Length);
+        output.Write(value.EffectCode);
     }
 }

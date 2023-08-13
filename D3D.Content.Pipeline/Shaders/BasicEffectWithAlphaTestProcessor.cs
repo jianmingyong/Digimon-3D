@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 namespace D3D.Content.Pipeline.Shaders;
 
 [ContentProcessor(DisplayName = "BasicEffectWithAlphaTest - D3D")]
-internal class BasicEffectWithAlphaTestProcessor : ContentProcessor<EffectContent, BasicEffectWithAlphaTestContent>
+public class BasicEffectWithAlphaTestProcessor : ContentProcessor<EffectContent, BasicEffectWithAlphaTestContent>
 {
     public EffectProcessorDebugMode DebugMode { get; set; }
 

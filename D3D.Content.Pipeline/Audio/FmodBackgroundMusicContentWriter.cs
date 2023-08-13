@@ -6,14 +6,14 @@ using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 namespace D3D.Content.Pipeline.Audio;
 
 [ContentTypeWriter]
-internal class FmodBgmContentWriter : ContentTypeWriter<FmodBgmContent>
+public class FmodBackgroundMusicContentWriter : ContentTypeWriter<FmodBackgroundMusicContent>
 {
     public override string GetRuntimeReader(TargetPlatform targetPlatform)
     {
-        return $"{typeof(FmodBgmContentReader).FullName}, {typeof(FmodBgmSound).Assembly.FullName}";
+        return $"{typeof(FmodBackgroundMusicContentReader).FullName}, {typeof(FmodBackgroundMusic).Assembly.FullName}";
     }
 
-    protected override void Write(ContentWriter output, FmodBgmContent value)
+    protected override void Write(ContentWriter output, FmodBackgroundMusicContent value)
     {
         output.Write(value.FileName);
         output.Write(value.LoopStart);

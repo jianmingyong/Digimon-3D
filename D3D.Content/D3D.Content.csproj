@@ -31,13 +31,14 @@
             <PackagePath>runtimes/win-x86/native/fmod.dll</PackagePath>
         </None>
     </ItemGroup>
-    
+
     <Target Name="AfterPack" AfterTargets="Pack">
         <ItemGroup>
-            <DirToDelete Include="$(NuGetPackageRoot)$(TargetName.ToLower())" />
+            <DirToDelete Include="$(NuGetPackageRoot)$(TargetName.ToLower())"/>
         </ItemGroup>
-        
+
         <RemoveDir Directories="@(DirToDelete)" ContinueOnError="true"/>
+
         <Exec Command="dotnet nuget push $(PackageOutputPath)*.nupkg --source Digimon_3D"/>
         <Exec Command="dotnet restore .."/>
     </Target>

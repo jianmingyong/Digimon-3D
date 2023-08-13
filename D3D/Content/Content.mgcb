@@ -16,7 +16,7 @@
 
 #begin Audio/BGM/TestTitle.ogg
 /importer:OggImporter
-/processor:FmodBgmProcessor
+/processor:FmodBackgroundMusicProcessor
 /processorParam:Quality=Best
 /processorParam:LoopStart=0
 /processorParam:LoopLength=0

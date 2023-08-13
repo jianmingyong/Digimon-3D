@@ -323,9 +323,9 @@ public sealed class BasicEffectWithAlphaTest : Effect, IEffectMatrices, IEffectL
     /// </summary>
     internal BasicEffectWithAlphaTest(GraphicsDevice device, byte[] data) : base(device, data)
     {
-        CacheEffectParameters(null);
-
         Debug.Assert(DirectionalLight0 != null, nameof(DirectionalLight0) + " != null");
+        
+        CacheEffectParameters(null);
 
         DirectionalLight0.Enabled = true;
         SpecularColor = Vector3.One;
