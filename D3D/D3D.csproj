@@ -4,6 +4,7 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <PublishReadyToRun>false</PublishReadyToRun>
+        <PublishSingleFile>true</PublishSingleFile>
         <TieredCompilation>false</TieredCompilation>
         <Nullable>enable</Nullable>
         <RuntimeIdentifiers>win-x64;win-x86;linux-x64;osx-x64</RuntimeIdentifiers>
@@ -21,6 +22,8 @@
 
     <ItemGroup>
         <PackageReference Include="Arch" Version="1.2.5"/>
+        <PackageReference Include="Arch.System" Version="1.0.2" />
+        <PackageReference Include="Arch.System.SourceGenerator" Version="1.1.0" />
         <PackageReference Include="D3D.Content" Version="1.0.0" />
         <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303"/>
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303"/>

@@ -4,7 +4,7 @@ using D3D.Content.Utilities;
 using FMOD;
 using Microsoft.Xna.Framework;
 
-namespace D3D.Audio;
+namespace D3D.Managers.Implementations;
 
 public sealed class FmodAudioManager : IFmodBackgroundMusicSystem, IFmodSoundEffectSystem, IDisposable
 {
@@ -88,14 +88,14 @@ public sealed class FmodAudioManager : IFmodBackgroundMusicSystem, IFmodSoundEff
     private ChannelGroup _backgroundMusicChannelGroup;
     private ChannelGroup _soundEffectChannelGroup;
 
-    public FmodAudioManager(Game game)
+    public FmodAudioManager(GameServiceContainer container)
     {
         Factory.System_Create(out _system).ThrowOnError();
 
         _system.init(1024, INITFLAGS.NORMAL, new IntPtr((int) OUTPUTTYPE.AUTODETECT)).ThrowOnError();
 
-        game.Services.AddService(typeof(IFmodBackgroundMusicSystem), this);
-        game.Services.AddService(typeof(IFmodSoundEffectSystem), this);
+        container.AddService(typeof(IFmodBackgroundMusicSystem), this);
+        container.AddService(typeof(IFmodSoundEffectSystem), this);
 
         _system.createChannelGroup("BGM", out _backgroundMusicChannelGroup).ThrowOnError();
         _system.createChannelGroup("SE", out _soundEffectChannelGroup).ThrowOnError();

@@ -1,6 +1,5 @@
-﻿using D3D.Audio;
-using D3D.Content.Audio;
-using D3D.Resources;
+﻿using D3D.Content.Audio;
+using D3D.Managers.Implementations;
 using D3D.Screens.Gui;
 using D3D.Utilities;
 using Microsoft.Xna.Framework;
@@ -18,7 +17,7 @@ public sealed class Core : Game
     public Core()
     {
         _graphics = new GraphicsDeviceManager(this);
-        _fmodAudioManager = new FmodAudioManager(this);
+        _fmodAudioManager = new FmodAudioManager(Services);
         _assetManager = new AssetManager(Content);
         _debugInformationDisplay = new DebugInformationDisplay(_graphics, _assetManager);
     }

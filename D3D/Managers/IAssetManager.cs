@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace D3D.Resources.Interface;
+namespace D3D.Managers;
 
 public interface IAssetManager
 {

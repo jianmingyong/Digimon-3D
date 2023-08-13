@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using D3D.Resources.Interface;
 using Microsoft.Xna.Framework.Content;
 
-namespace D3D.Resources;
+namespace D3D.Managers.Implementations;
 
 public sealed class AssetManager : IAssetManager, IDisposable
 {
     private readonly List<ContentManager> _contentManagers = new();
+
+    private readonly ContentManager _baseContentManager;
+    
+    private ContentManager? _gameModeContentManager;
     
     public AssetManager(ContentManager baseContentManager)
     {
+        _baseContentManager = baseContentManager;
         _contentManagers.Add(baseContentManager);
     }
 
