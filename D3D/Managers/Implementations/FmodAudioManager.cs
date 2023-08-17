@@ -1,6 +1,7 @@
-﻿using System;
+﻿using System.ComponentModel;
 using D3D.Content.Audio;
 using D3D.Content.Utilities;
+using D3D.Managers.Implementations.Settings;
 using FMOD;
 using Microsoft.Xna.Framework;
 
@@ -8,114 +9,102 @@ namespace D3D.Managers.Implementations;
 
 public sealed class FmodAudioManager : IFmodBackgroundMusicSystem, IFmodSoundEffectSystem, IDisposable
 {
-    /// <summary>
-    ///     Background Music volume.
-    /// </summary>
-    /// <param name="value">
-    ///     Volume level. 0 = silent, 1 = full. Negative level inverts the signal. Values larger than 1 amplify
-    ///     the signal.
-    /// </param>
-    /// <returns>Volume level</returns>
-    public float BackgroundMusicVolume
-    {
-        get
-        {
-            _backgroundMusicChannelGroup.getVolume(out var volume).ThrowOnError();
-            return volume;
-        }
-
-        set => _backgroundMusicChannelGroup.setVolume(value).ThrowOnError();
-    }
-
-    /// <summary>
-    ///     Background Music mute state.
-    /// </summary>
-    /// <param name="value">Mute state. True = silent. False = audible.</param>
-    /// <returns>Mute state.</returns>
-    public bool BackgroundMusicIsMute
-    {
-        get
-        {
-            _backgroundMusicChannelGroup.getMute(out var mute).ThrowOnError();
-            return mute;
-        }
-
-        set => _backgroundMusicChannelGroup.setMute(value).ThrowOnError();
-    }
-
-    /// <summary>
-    ///     Sound Effect volume.
-    /// </summary>
-    /// <param name="value">
-    ///     Volume level. 0 = silent, 1 = full. Negative level inverts the signal. Values larger than 1 amplify
-    ///     the signal.
-    /// </param>
-    /// <returns>Volume level</returns>
-    public float SoundEffectVolume
-    {
-        get
-        {
-            _soundEffectChannelGroup.getVolume(out var volume).ThrowOnError();
-            return volume;
-        }
-
-        set => _soundEffectChannelGroup.setVolume(value).ThrowOnError();
-    }
-    
-    /// <summary>
-    ///     Sound Effect mute state.
-    /// </summary>
-    /// <param name="value">Mute state. True = silent. False = audible.</param>
-    /// <returns>Mute state.</returns>
-    public bool SoundEffectIsMute
-    {
-        get
-        {
-            _soundEffectChannelGroup.getMute(out var mute).ThrowOnError();
-            return mute;
-        }
-
-        set => _soundEffectChannelGroup.setMute(value).ThrowOnError();
-    }
-
     FMOD.System IFmodSystem.System => _system;
 
     ChannelGroup IFmodBackgroundMusicSystem.ChannelGroup => _backgroundMusicChannelGroup;
 
     ChannelGroup IFmodSoundEffectSystem.ChannelGroup => _soundEffectChannelGroup;
 
+    private readonly GameSettingManager _gameSettingManager;
+    private readonly IAssetManager _assetManager;
+
     private FMOD.System _system;
     private ChannelGroup _backgroundMusicChannelGroup;
     private ChannelGroup _soundEffectChannelGroup;
 
-    public FmodAudioManager(GameServiceContainer container)
+    public FmodAudioManager(Game game, GameSettingManager gameSettingManager, IAssetManager assetManager)
     {
+        _gameSettingManager = gameSettingManager;
+        _assetManager = assetManager;
+
         Factory.System_Create(out _system).ThrowOnError();
 
         _system.init(1024, INITFLAGS.NORMAL, new IntPtr((int) OUTPUTTYPE.AUTODETECT)).ThrowOnError();
-
-        container.AddService(typeof(IFmodBackgroundMusicSystem), this);
-        container.AddService(typeof(IFmodSoundEffectSystem), this);
-
         _system.createChannelGroup("BGM", out _backgroundMusicChannelGroup).ThrowOnError();
         _system.createChannelGroup("SE", out _soundEffectChannelGroup).ThrowOnError();
+
+        _backgroundMusicChannelGroup.setVolume(gameSettingManager.BackgroundMusicVolume).ThrowOnError();
+        _backgroundMusicChannelGroup.setMute(gameSettingManager.BackgroundMusicIsMuted).ThrowOnError();
+        
+        _soundEffectChannelGroup.setVolume(gameSettingManager.SoundEffectMusicVolume).ThrowOnError();
+        _soundEffectChannelGroup.setMute(gameSettingManager.SoundEffectMusicIsMuted).ThrowOnError();
+
+        _gameSettingManager.PropertyChanged += GameSettingManagerOnPropertyChanged;
+
+        game.Services.AddService(typeof(FmodAudioManager), this);
+        game.Services.AddService(typeof(IFmodBackgroundMusicSystem), this);
+        game.Services.AddService(typeof(IFmodSoundEffectSystem), this);
+    }
+
+    ~FmodAudioManager()
+    {
+        ReleaseUnmanagedResources();
+    }
+
+    public FmodBackgroundMusic LoadBackgroundMusic(string filePath)
+    {
+        return _assetManager.TryLoadAsset<FmodBackgroundMusic>(filePath, out var result) ? result : new FmodBackgroundMusic(this, filePath);
+    }
+
+    public FmodSoundEffect LoadSoundEffect(string filePath)
+    {
+        return _assetManager.TryLoadAsset<FmodSoundEffect>(filePath, out var result) ? result : new FmodSoundEffect(this, filePath);
+    }
+
+    private void GameSettingManagerOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(GameSettingManager.BackgroundMusicVolume):
+                _backgroundMusicChannelGroup.setVolume(_gameSettingManager.BackgroundMusicVolume).ThrowOnError();
+                break;
+
+            case nameof(GameSettingManager.BackgroundMusicIsMuted):
+                _backgroundMusicChannelGroup.setMute(_gameSettingManager.BackgroundMusicIsMuted).ThrowOnError();
+                break;
+            
+            case nameof(GameSettingManager.SoundEffectMusicVolume):
+                _soundEffectChannelGroup.setVolume(_gameSettingManager.SoundEffectMusicVolume).ThrowOnError();
+                break;
+            
+            case nameof(GameSettingManager.SoundEffectMusicIsMuted):
+                _soundEffectChannelGroup.setMute(_gameSettingManager.SoundEffectMusicIsMuted).ThrowOnError();
+                break;
+        }
+    }
+
+    private void ReleaseUnmanagedResources()
+    {
+        if (_backgroundMusicChannelGroup.hasHandle() && _backgroundMusicChannelGroup.release() == RESULT.OK)
+        {
+            _backgroundMusicChannelGroup.clearHandle();
+        }
+
+        if (_soundEffectChannelGroup.hasHandle() && _soundEffectChannelGroup.release() == RESULT.OK)
+        {
+            _soundEffectChannelGroup.clearHandle();
+        }
+
+        if (_system.hasHandle() && _system.release() == RESULT.OK)
+        {
+            _system.clearHandle();
+        }
     }
 
     public void Dispose()
     {
-        if (_backgroundMusicChannelGroup.hasHandle())
-        {
-            _backgroundMusicChannelGroup.release().ThrowOnError();
-        }
-
-        if (_soundEffectChannelGroup.hasHandle())
-        {
-            _soundEffectChannelGroup.release().ThrowOnError();
-        }
-
-        if (_system.hasHandle())
-        {
-            _system.release().ThrowOnError();
-        }
+        _gameSettingManager.PropertyChanged -= GameSettingManagerOnPropertyChanged;
+        ReleaseUnmanagedResources();
+        GC.SuppressFinalize(this);
     }
 }

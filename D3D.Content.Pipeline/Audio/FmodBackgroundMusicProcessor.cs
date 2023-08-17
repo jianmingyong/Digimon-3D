@@ -38,7 +38,7 @@ public class FmodBackgroundMusicProcessor : ContentProcessor<AudioContent, FmodB
             context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", Quality, finalQuality);
         }
 
-        var fileName = Path.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) ?? string.Empty, songFileName);
+        var fileName = Path.GetRelativePath(Path.GetDirectoryName(context.OutputFilename)!, songFileName);
         return new FmodBackgroundMusicContent(fileName, LoopStart, loopEnd);
     }
 }

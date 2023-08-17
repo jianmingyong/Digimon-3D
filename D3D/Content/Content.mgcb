@@ -6,7 +6,7 @@
 /platform:DesktopGL
 /config:
 /profile:Reach
-/compress:False
+/compress:True
 
 #-------------------------------- References --------------------------------#
 
@@ -14,13 +14,13 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Audio/BGM/TestTitle.ogg
+#begin Audio/BGM/Title.ogg
 /importer:OggImporter
 /processor:FmodBackgroundMusicProcessor
 /processorParam:Quality=Best
 /processorParam:LoopStart=0
 /processorParam:LoopLength=0
-/build:Audio/BGM/TestTitle.ogg
+/build:Audio/BGM/Title.ogg
 
 #begin Fonts/Pixel Digivolve.spritefont
 /importer:FontDescriptionImporter

@@ -1,10 +1,11 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 using D3D.Managers;
+using D3D.Managers.Implementations;
 using D3D.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace D3D.Screens.Gui;
 
@@ -36,7 +37,8 @@ public sealed class DebugInformationDisplay : IDisposable
     
     private readonly IGraphicsDeviceService _graphicsDeviceService;
     private readonly IAssetManager _assetManager;
-    
+    private readonly InputManager _inputManager;
+
     private readonly FrameMonitor _frameMonitor = new();
     private readonly StringBuilder _stringBuilder = new();
     
@@ -45,10 +47,11 @@ public sealed class DebugInformationDisplay : IDisposable
 
     private bool _canDraw;
     
-    public DebugInformationDisplay(IGraphicsDeviceService graphicsDeviceService, IAssetManager assetManager)
+    public DebugInformationDisplay(IGraphicsDeviceService graphicsDeviceService, IAssetManager assetManager, InputManager inputManager)
     {
         _graphicsDeviceService = graphicsDeviceService;
         _assetManager = assetManager;
+        _inputManager = inputManager;
     }
 
     public void Initialize()
@@ -65,6 +68,11 @@ public sealed class DebugInformationDisplay : IDisposable
     public void Update()
     {
         _frameMonitor.Update();
+
+        if (_inputManager.IsKeyDown(Keys.F3, false))
+        {
+            _canDraw = !_canDraw;
+        }
     }
     
     public void Draw()

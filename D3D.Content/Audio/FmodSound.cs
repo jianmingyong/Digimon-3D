@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using D3D.Content.Utilities;
+﻿using D3D.Content.Utilities;
 using FMOD;
 using Microsoft.Xna.Framework;
 
@@ -46,17 +44,17 @@ public abstract class FmodSound : IDisposable
     {
         get
         {
-            if (!Channel.hasHandle()) return false;
-            Channel.getPaused(out var paused).ThrowOnError();
-            return !paused;
+            if (!channel.hasHandle()) return false;
+            if (channel.getPaused(out var isPaused) == RESULT.OK) return !isPaused;
+            return false;
         }
     }
 
     protected FMOD.System System => _fmodSystem.System;
     protected abstract ChannelGroup ChannelGroup { get; }
     
-    protected Sound Sound;
-    protected Channel Channel;
+    protected Sound sound;
+    protected Channel channel;
 
     private readonly IFmodSystem _fmodSystem;
     
@@ -68,23 +66,23 @@ public abstract class FmodSound : IDisposable
     private uint _loopStart;
     private uint _loopEnd;
 
-    protected FmodSound(IFmodSystem fmodSystem, string fileName, MODE mode)
+    protected FmodSound(IFmodSystem fmodSystem, string filePath, MODE mode)
     {
         _fmodSystem = fmodSystem;
         
         string path;
         
-        using var stream = (FileStream) TitleContainer.OpenStream(fileName);
+        using var stream = (FileStream) TitleContainer.OpenStream(filePath);
         {
             path = stream.Name;
         }
 
-        System.createSound(path, mode, out Sound).ThrowOnError();
+        System.createSound(path, mode, out sound).ThrowOnError();
         
-        Sound.getName(out _name, 256).ThrowOnError();
-        Sound.getFormat(out _type, out _format, out _channels, out _bits).ThrowOnError();
-        Sound.getLength(out var length, TIMEUNIT.MS).ThrowOnError();
-        Sound.getLoopPoints(out _loopStart, TIMEUNIT.PCM, out _loopEnd, TIMEUNIT.PCM).ThrowOnError();
+        sound.getName(out _name, 256).ThrowOnError();
+        sound.getFormat(out _type, out _format, out _channels, out _bits).ThrowOnError();
+        sound.getLength(out var length, TIMEUNIT.MS).ThrowOnError();
+        sound.getLoopPoints(out _loopStart, TIMEUNIT.PCM, out _loopEnd, TIMEUNIT.PCM).ThrowOnError();
         
         Length = TimeSpan.FromMilliseconds(length);
     }
@@ -98,12 +96,12 @@ public abstract class FmodSound : IDisposable
             cbsize = MarshalHelper.SizeOf(typeof(CREATESOUNDEXINFO))
         };
 
-        System.createSound(data, mode, ref exInfo, out Sound).ThrowOnError();
+        System.createSound(data, mode, ref exInfo, out sound).ThrowOnError();
         
-        Sound.getName(out _name, 256).ThrowOnError();
-        Sound.getFormat(out _type, out _format, out _channels, out _bits).ThrowOnError();
-        Sound.getLength(out var length, TIMEUNIT.MS).ThrowOnError();
-        Sound.getLoopPoints(out _loopStart, TIMEUNIT.PCM, out _loopEnd, TIMEUNIT.PCM).ThrowOnError();
+        sound.getName(out _name, 256).ThrowOnError();
+        sound.getFormat(out _type, out _format, out _channels, out _bits).ThrowOnError();
+        sound.getLength(out var length, TIMEUNIT.MS).ThrowOnError();
+        sound.getLoopPoints(out _loopStart, TIMEUNIT.PCM, out _loopEnd, TIMEUNIT.PCM).ThrowOnError();
         
         Length = TimeSpan.FromMilliseconds(length);
     }
@@ -118,13 +116,13 @@ public abstract class FmodSound : IDisposable
     /// </summary>
     public virtual void Play()
     {
-        if (Channel.hasHandle())
+        if (channel.hasHandle() && channel.getPaused(out var isPaused) == RESULT.OK && isPaused)
         {
-            Resume();
+            channel.setPaused(false).ThrowOnError();
             return;
         }
 
-        System.playSound(Sound, ChannelGroup, false, out Channel).ThrowOnError();
+        System.playSound(sound, ChannelGroup, false, out channel).ThrowOnError();
     }
 
     /// <summary>
@@ -132,8 +130,10 @@ public abstract class FmodSound : IDisposable
     /// </summary>
     public virtual void Pause()
     {
-        if (!Channel.hasHandle()) return;
-        Channel.setPaused(true).ThrowOnError();
+        if (channel.hasHandle() && channel.getPaused(out var isPaused) == RESULT.OK && !isPaused)
+        {
+            channel.setPaused(true).ThrowOnError();
+        }
     }
 
     /// <summary>
@@ -141,8 +141,10 @@ public abstract class FmodSound : IDisposable
     /// </summary>
     public virtual void Resume()
     {
-        if (!Channel.hasHandle()) return;
-        Channel.setPaused(false).ThrowOnError();
+        if (channel.hasHandle() && channel.getPaused(out var isPaused) == RESULT.OK && isPaused)
+        {
+            channel.setPaused(false).ThrowOnError();
+        }
     }
 
     /// <summary>
@@ -150,8 +152,10 @@ public abstract class FmodSound : IDisposable
     /// </summary>
     public virtual void Stop()
     {
-        if (!Channel.hasHandle()) return;
-        Channel.stop().ThrowOnError();
+        if (channel.stop() == RESULT.OK)
+        {
+            channel.clearHandle();
+        }
     }
     
     /// <summary>
@@ -161,7 +165,7 @@ public abstract class FmodSound : IDisposable
     /// <param name="loopEnd">Loop end point in PCM format.</param>
     public virtual void SetLoopPoints(uint loopStart, uint loopEnd)
     {
-        Sound.setLoopPoints(loopStart, TIMEUNIT.PCM, loopEnd, TIMEUNIT.PCM).ThrowOnError();
+        sound.setLoopPoints(loopStart, TIMEUNIT.PCM, loopEnd, TIMEUNIT.PCM).ThrowOnError();
         
         _loopStart = loopStart;
         _loopEnd = loopEnd;
@@ -169,9 +173,9 @@ public abstract class FmodSound : IDisposable
 
     private void ReleaseUnmanagedResources()
     {
-        if (Sound.hasHandle())
+        if (System.hasHandle() && sound.hasHandle() && sound.release() == RESULT.OK)
         {
-            Sound.release().ThrowOnError();
+            sound.clearHandle();
         }
     }
 

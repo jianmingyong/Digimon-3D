@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
 namespace D3D.Managers.Implementations;
@@ -13,10 +13,13 @@ public sealed class AssetManager : IAssetManager, IDisposable
     
     private ContentManager? _gameModeContentManager;
     
-    public AssetManager(ContentManager baseContentManager)
+    public AssetManager(Game game)
     {
-        _baseContentManager = baseContentManager;
-        _contentManagers.Add(baseContentManager);
+        _baseContentManager = game.Content;
+        UpdateAssetManagers();
+        
+        game.Services.AddService(typeof(AssetManager), this);
+        game.Services.AddService(typeof(IAssetManager), this);
     }
 
     public T LoadAsset<T>(string assetName)
@@ -39,6 +42,24 @@ public sealed class AssetManager : IAssetManager, IDisposable
         throw exception;
     }
 
+    public bool TryLoadAsset<T>(string assetName, [MaybeNullWhen(false)] out T asset)
+    {
+        foreach (var contentManager in _contentManagers)
+        {
+            try
+            {
+                asset = contentManager.Load<T>(assetName);
+                return true;
+            }
+            catch (ContentLoadException)
+            {
+            }
+        }
+
+        asset = default;
+        return false;
+    }
+    
     public void UnloadAsset(string assetName)
     {
         foreach (var contentManager in _contentManagers)
@@ -61,6 +82,18 @@ public sealed class AssetManager : IAssetManager, IDisposable
         {
             contentManager.Unload();
         }
+    }
+
+    private void UpdateAssetManagers()
+    {
+        _contentManagers.Clear();
+
+        if (_gameModeContentManager != null)
+        {
+            _contentManagers.Add(_gameModeContentManager);
+        }
+        
+        _contentManagers.Add(_baseContentManager);
     }
 
     public void Dispose()
